@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRADE-READY QUIZ · TERRIFIC IS BACK</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .quiz-wrapper {
+            width: 100%;
+            max-width: 950px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3rem;
+            padding: 2rem 2rem 2.5rem;
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #c084fc, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.8rem;
+            text-align: center;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .panel {
+            background: rgba(10, 15, 30, 0.7);
+            border-radius: 2.5rem;
+            padding: 2rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.5);
+        }
+
+        /* step cards */
+        .step {
+            transition: opacity 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step.hidden-step, .game-area.hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+        }
+
+        /* option groups */
+        .option-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .pill {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1.5px solid rgba(255, 255, 255, 0.03);
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            user-select: none;
+        }
+
+        .pill:hover {
+            background: #334155;
+            border-color: #60a5fa;
+            transform: scale(1.02);
+        }
+
+        .pill.selected {
+            background: #2563eb;
+            border-color: #f0f9ff;
+            color: white;
+            box-shadow: 0 0 15px #3b82f6;
+        }
+
+        .pill.small {
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+        }
+
+        .players-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.6rem 0.3rem;
+        }
+
+        .vs-computer {
+            background: #7e22ce;
+            border-color: #a855f7;
+            margin-right: 0.5rem;
+        }
+        .vs-computer.selected {
+            background: #9333ea;
+            border-color: #e9d5ff;
+        }
+
+        .q-count {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .subjects-matrix, .class-matrix {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin: 1.8rem 0 0.8rem;
+        }
+
+        .info-bar {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 3rem;
+            padding: 1.2rem 1.8rem;
+            margin: 2rem 0 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #3b4455;
+            color: #b0c4de;
+            font-size: 1.1rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .info-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-icon {
+            background: #1e293b;
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #facc15;
+        }
+
+        .navigate-btn, .game-btn {
+            background: white;
+            border: none;
+            color: #0f172a;
+            padding: 1rem 2.8rem;
+            border-radius: 60px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 20px -5px #020617;
+            border: 1px solid rgba(255,255,255,0.4);
+            letter-spacing: 0.5px;
+        }
+
+        .navigate-btn:hover, .game-btn:hover {
+            background: #e6f0ff;
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 20px 30px -8px #0f172a;
+        }
+
+        .navigate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .secondary-btn {
+            background: transparent;
+            border: 2px solid #4b5563;
+            color: #f1f5f9;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .secondary-btn:hover {
+            border-color: #94a3b8;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #475569;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .dot.active {
+            background: #3b82f6;
+            width: 24px;
+        }
+
+        /* summary text */
+        .summary-text {
+            background: #1e2b3c;
+            padding: 1.4rem;
+            border-radius: 2rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            font-size: 1.15rem;
+            border: 1px solid #3b4e6b;
+        }
+
+        .summary-text span {
+            color: #fcd34d;
+            font-weight: 600;
+        }
+
+        .footnote {
+            color: #6b7b93;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        /* game area */
+        .game-area {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            background: #1e2a3a;
+            padding: 1rem 2rem;
+            border-radius: 60px;
+            margin-bottom: 2.5rem;
+            color: #b9c9e6;
+            font-weight: 600;
+            border: 1px solid #3f4e6b;
+        }
+
+        .quiz-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .question-box {
+            background: #0d1624;
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #3b5270;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #f0f4fa;
+            line-height: 1.4;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .option-card {
+            background: #1e2f42;
+            border: 2px solid #2e3f5a;
+            padding: 1.3rem 1rem;
+            border-radius: 1.8rem;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #deecff;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 6px 0 #0f1a24;
+        }
+
+        .option-card:hover:not(.disabled-option) {
+            background: #2b3f5a;
+            border-color: #628dce;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #0f1a24;
+        }
+
+        .option-card.selected-option {
+            background: #2563eb;
+            border-color: #aac8ff;
+            color: white;
+            box-shadow: 0 6px 0 #1e3a8a;
+        }
+
+        .option-prefix {
+            background: #0f1e30;
+            border-radius: 40px;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #90b4f0;
+        }
+
+        .selected-option .option-prefix {
+            background: #1e40af;
+            color: white;
+        }
+
+        .game-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+
+        .timer-box {
+            background: #111e30;
+            padding: 0.8rem 2rem;
+            border-radius: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fbbf24;
+            text-shadow: 0 0 8px #f59e0b;
+            border: 1px solid #f59e0b40;
+        }
+
+        .action-btn {
+            background: #22c55e;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #0f172a;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 0 #15803d;
+        }
+
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #15803d;
+        }
+
+        .action-btn:disabled, .option-card.disabled-option {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .back-to-config {
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            transition: 0.2s;
+        }
+        .back-to-config:hover {
+            background: #64748b;
+        }
+
+        .loading-message {
+            color: #fcd34d;
+            font-size: 1.3rem;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="quiz-wrapper">
+    <h1>⚡ TERRIFIC IS BACK · REAL QUESTIONS ⚡</h1>
+    <div class="panel">
+        <!-- config mode steps (expanded) -->
+        <div id="configMode">
+            <!-- STEP 1 - DIFFICULTY with TERRIFIC -->
+            <div id="step1" class="step">
+                <div class="step-title">❶ choose your difficulty</div>
+                <div class="option-grid" id="difficultyGroup">
+                    <div class="pill" data-diff="easy">easy</div>
+                    <div class="pill" data-diff="medium">medium</div>
+                    <div class="pill" data-diff="hard">hard</div>
+                    <div class="pill" data-diff="terrific">terrific 🔥</div>
+                </div>
+                <div class="btn-group">
+                    <button class="navigate-btn" id="toStep2">next →</button>
+                </div>
+            </div>
+
+            <!-- STEP 2 – OPPONENTS (computer / friends) -->
+            <div id="step2" class="step hidden-step">
+                <div class="step-title">❷ play with computer or friends?</div>
+                <div class="players-group" id="playersGroup">
+                    <div class="pill vs-computer" data-player="computer">🖥️ computer</div>
+                    <div class="pill" data-player="1">1 friend</div>
+                    <div class="pill" data-player="2">2</div><div class="pill" data-player="3">3</div>
+                    <div class="pill" data-player="4">4</div><div class="pill" data-player="5">5</div>
+                    <div class="pill" data-player="6">6</div><div class="pill" data-player="7">7</div>
+                    <div class="pill" data-player="8">8</div><div class="pill" data-player="9">9</div>
+                    <div class="pill" data-player="10">10</div>
+                </div>
+                <div class="btn-group">
+                    <button class="secondary-btn" id="backTo1">← back</button>
+                    <button class="navigate-btn" id="toStep3">next →</button>
+                </div>
+            </div>
+
+            <!-- STEP 3 – QUESTIONS 20/30/50 -->
+            <div id="step3" class="step hidden-step">
+                <div class="step-title">❸ number of questions</div>
+                <div class="q-count" id="questionCountGroup">
+                    <div class="pill small" data-q="10">10 questions</div>
+                    <div class="pill small" data-q="20">20 questions</div>
+                    <div class="pill small" data-q="30">30 questions</div>
+                </div>
+                <div class="info-bar">
+                    <div class="info-badge"><span class="badge-icon">⏱️</span> 10 sec / question</div>
+                    <div class="info-badge"><span class="badge-icon">🎯</span> 6 marks each</div>
+                </div>
+                <div class="btn-group">
+                    <button class="secondary-btn" id="backTo2">← back</button>
+                    <button class="navigate-btn" id="toStep4">next →</button>
+                </div>
+            </div>
+
+            <!-- STEP 4 – SUBJECTS (multi) with class selector -->
+            <div id="step4" class="step hidden-step">
+                <div class="step-title">❹ choose subject & class (1-12)</div>
+                <!-- subjects -->
+                <div style="margin-bottom: 1rem; color:#94a3b8;">📘 subject (one or many)</div>
+                <div class="subjects-matrix" id="subjectsGroup">
+                    <div class="pill small" data-subj="geography">🌍 geography</div>
+                    <div class="pill small" data-subj="physics">⚛️ physics</div>
+                    <div class="pill small" data-subj="biology">🧬 biology</div>
+                    <div class="pill small" data-subj="sports_science">🏅 sports science</div>
+                    <div class="pill small" data-subj="gk">🧠 general knowledge</div>
+                    <div class="pill small" data-subj="english_grammar">📚 english grammar</div>
+                    <div class="pill small" data-subj="psychology">🧠 psychology</div>
+                    <div class="pill small" data-subj="inventors">💡 inventions & inventors</div>
+                    <div class="pill small" data-subj="chemistry">🧪 chemistry</div>
+                </div>
+                <!-- class selector (single) -->
+                <div style="margin: 1.2rem 0 0.5rem; color:#94a3b8;">🎓 class (grade 1 to 12)</div>
+                <div class="class-matrix" id="classGroup">
+                    <!-- generate 1..12 -->
+                </div>
+                <div class="btn-group">
+                    <button class="secondary-btn" id="backTo3">← back</button>
+                    <button class="navigate-btn" id="toStep5">review →</button>
+                </div>
+            </div>
+
+            <!-- STEP 5 – SUMMARY & START GAME (with API call) -->
+            <div id="step5" class="step hidden-step">
+                <div class="step-title">✅ review & fetch from internet</div>
+                <div id="finalSummary" class="summary-text">loading...</div>
+                <div class="info-bar" style="justify-content: center; margin-top: 1.5rem;">
+                    <span>🌐 questions via OpenTrivia DB · 4 options</span>
+                </div>
+                <div class="btn-group" style="justify-content: center;">
+                    <button class="secondary-btn" id="backTo4">← edit</button>
+                    <button class="navigate-btn" id="launchGameBtn">🚀 FETCH & START</button>
+                </div>
+            </div>
+
+            <!-- progress dots -->
+            <div class="progress-dots">
+                <span class="dot" id="dot1"></span><span class="dot" id="dot2"></span><span class="dot" id="dot3"></span>
+                <span class="dot" id="dot4"></span><span class="dot" id="dot5"></span>
+            </div>
+        </div>
+
+        <!-- GAME MODE (dynamic) -->
+        <div id="gameMode" class="game-area hidden">
+            <button class="back-to-config" id="backToConfigBtn">‹ change settings</button>
+            <div class="game-header">
+                <div class="quiz-stats">
+                    <span id="gameDifficulty">difficulty</span>
+                    <span id="gameMeta">class / subject</span>
+                </div>
+                <div>question <span id="currentQ">1</span>/<span id="totalQ">20</span></div>
+            </div>
+
+            <div class="question-box" id="questionText">
+                Fetching questions from internet ...
+            </div>
+
+            <div class="options-grid" id="optionsContainer">
+                <!-- injected via js -->
+            </div>
+
+            <div class="game-footer">
+                <div class="timer-box" id="timerDisplay">10s</div>
+                <button class="action-btn" id="submitAnswerBtn" disabled>submit</button>
+            </div>
+            <div style="color:#a9c9ff; text-align:center; margin-top:1rem;" id="gameMessage"></div>
+        </div>
+    </div>
+    <div class="footnote">now with class 1‑12 · real API questions · terrific difficulty restored</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- state ----------
+        let currentStep = 1;               
+        const selections = {
+            difficulty: null,
+            player: null,
+            questionCount: '10',            // default 10 for api limit
+            subjects: new Set(),
+            classLevel: null                // 1..12 as string
+        };
+
+        // DOM elements config
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const step5 = document.getElementById('step5');
+        const steps = [null, step1, step2, step3, step4, step5];
+        const dots = [null, 
+            document.getElementById('dot1'),document.getElementById('dot2'),
+            document.getElementById('dot3'),document.getElementById('dot4'),document.getElementById('dot5')];
+
+        // navigation
+        const toStep2Btn = document.getElementById('toStep2');
+        const toStep3Btn = document.getElementById('toStep3');
+        const toStep4Btn = document.getElementById('toStep4');
+        const toStep5Btn = document.getElementById('toStep5');
+        const backTo1 = document.getElementById('backTo1');
+        const backTo2 = document.getElementById('backTo2');
+        const backTo3 = document.getElementById('backTo3');
+        const backTo4 = document.getElementById('backTo4');
+        const launchGameBtn = document.getElementById('launchGameBtn');
+        const backToConfigBtn = document.getElementById('backToConfigBtn');
+
+        // groups
+        const diffGroup = document.getElementById('difficultyGroup');
+        const playersGroup = document.getElementById('playersGroup');
+        const qGroup = document.getElementById('questionCountGroup');
+        const subjectsGroup = document.getElementById('subjectsGroup');
+        const classGroup = document.getElementById('classGroup');
+        const finalSummary = document.getElementById('finalSummary');
+
+        // game elements
+        const configMode = document.getElementById('configMode');
+        const gameMode = document.getElementById('gameMode');
+        const gameDifficultySpan = document.getElementById('gameDifficulty');
+        const gameMetaSpan = document.getElementById('gameMeta');
+        const currentQSpan = document.getElementById('currentQ');
+        const totalQSpan = document.getElementById('totalQ');
+        const questionTextDiv = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const submitBtn = document.getElementById('submitAnswerBtn');
+        const gameMessage = document.getElementById('gameMessage');
+
+        // ---------- populate class pills (1-12) ----------
+        for (let i = 1; i <= 12; i++) {
+            let pill = document.createElement('div');
+            pill.className = 'pill small';
+            pill.dataset.class = i;
+            pill.innerText = 'class ' + i;
+            classGroup.appendChild(pill);
+        }
+
+        // ---------- helper functions ----------
+        function goToStep(n) {
+            for (let i=1; i<=5; i++) if(steps[i]) steps[i].classList.add('hidden-step');
+            steps[n].classList.remove('hidden-step');
+            for (let i=1; i<=5; i++) {
+                if(dots[i]) {
+                    if(i===n) dots[i].classList.add('active');
+                    else dots[i].classList.remove('active');
+                }
+            }
+            currentStep = n;
+            if (n===5) updateSummary();
+        }
+
+        function updateSummary() {
+            let diff = selections.difficulty || '—';
+            let player = selections.player ? (selections.player==='computer'?'🖥️ computer':`👥 ${selections.player} friend(s)`) : '—';
+            let qCount = selections.questionCount || '—';
+            let subjectsList = selections.subjects.size ? 
+                Array.from(selections.subjects).map(s=>s.replace(/_/g,' ')).join(', ') : 'none';
+            let classLevel = selections.classLevel ? `class ${selections.classLevel}` : '—';
+            finalSummary.innerHTML = `<span>⚡ difficulty:</span> ${diff}<br><span>🎮 opponent:</span> ${player}<br><span>📋 questions:</span> ${qCount} (10s, 6 marks)<br><span>📚 subjects:</span> ${subjectsList}<br><span>🎓 class:</span> ${classLevel}`;
+        }
+
+        // pill selections
+        function attachSingleSelect(container, groupKey) {
+            if(!container) return;
+            const pills = container.querySelectorAll('.pill');
+            pills.forEach(pill => {
+                pill.addEventListener('click', ()=>{
+                    const value = pill.dataset[groupKey];
+                    if(!value) return;
+                    pills.forEach(p=>p.classList.remove('selected'));
+                    pill.classList.add('selected');
+                    if(groupKey==='diff') selections.difficulty = value;
+                    else if(groupKey==='player') selections.player = value;
+                    else if(groupKey==='q') selections.questionCount = value;
+                });
+            });
+        }
+
+        // class single select
+        const classPills = classGroup.querySelectorAll('.pill');
+        classPills.forEach(pill => {
+            pill.addEventListener('click', ()=>{
+                classPills.forEach(p=>p.classList.remove('selected'));
+                pill.classList.add('selected');
+                selections.classLevel = pill.dataset.class;
+            });
+        });
+
+        // subjects multi
+        function setupSubjects() {
+            const subjPills = subjectsGroup.querySelectorAll('.pill');
+            subjPills.forEach(pill => {
+                pill.addEventListener('click', ()=>{
+                    const subj = pill.dataset.subj;
+                    if(!subj) return;
+                    if(selections.subjects.has(subj)) {
+                        selections.subjects.delete(subj);
+                        pill.classList.remove('selected');
+                    } else {
+                        selections.subjects.add(subj);
+                        pill.classList.add('selected');
+                    }
+                });
+            });
+        }
+
+        function refreshPillsFromState() {
+            if(selections.difficulty) {
+                let t = document.querySelector(`[data-diff="${selections.difficulty}"]`);
+                if(t) { document.querySelectorAll('#difficultyGroup .pill').forEach(p=>p.classList.remove('selected')); t.classList.add('selected'); }
+            }
+            if(selections.player) {
+                let t = document.querySelector(`[data-player="${selections.player}"]`);
+                if(t) { document.querySelectorAll('#playersGroup .pill').forEach(p=>p.classList.remove('selected')); t.classList.add('selected'); }
+            }
+            if(selections.questionCount) {
+                let t = document.querySelector(`[data-q="${selections.questionCount}"]`);
+                if(t) { document.querySelectorAll('#questionCountGroup .pill').forEach(p=>p.classList.remove('selected')); t.classList.add('selected'); }
+            }
+            if(selections.subjects.size) {
+                document.querySelectorAll('#subjectsGroup .pill').forEach(p=>{
+                    let subj = p.dataset.subj;
+                    if(subj && selections.subjects.has(subj)) p.classList.add('selected');
+                    else p.classList.remove('selected');
+                });
+            }
+            if(selections.classLevel) {
+                let t = document.querySelector(`[data-class="${selections.classLevel}"]`);
+                if(t) {
+                    classPills.forEach(p=>p.classList.remove('selected'));
+                    t.classList.add('selected');
+                }
+            }
+        }
+
+        function canMoveFrom(step) {
+            if(step===1) return selections.difficulty!==null;
+            if(step===2) return selections.player!==null;
+            if(step===3) return selections.questionCount!==null;
+            if(step===4) return (selections.subjects.size > 0) && (selections.classLevel!==null);
+            return true;
+        }
+
+        // ---------- API fetch & game logic ----------
+        let currentQuestions = [];     // from API
+        let currentIndex = 0;
+        let score = 0;
+        let timerInterval = null;
+        let timeLeft = 10;
+        let optionsLocked = false;
+        let selectedOption = null;
+        let totalQuestions = 20;
+
+        // Map subject to OpenTrivia category (approximate)
+        function getCategoryId(subject) {
+            const map = {
+                'gk': 9,
+                'geography': 22,
+                'physics': 17,
+                'biology': 17,
+                'chemistry': 17,
+                'sports_science': 21,
+                'english_grammar': 10,
+                'psychology': 20,
+                'inventors': 24,
+            };
+            return map[subject] || 9; 
+        }
+
+        async function fetchQuestions() {
+            let amount = parseInt(selections.questionCount) || 10;
+            let category = 9; // default general
+            if (selections.subjects.size === 1) {
+                let firstSubj = Array.from(selections.subjects)[0];
+                category = getCategoryId(firstSubj);
+            } // if multiple, keep general (9)
+            let difficulty = selections.difficulty || 'easy';
+            // terrific maps to hard (since api has only easy/medium/hard)
+            let apiDifficulty = (difficulty === 'terrific') ? 'hard' : difficulty;
+            const url = `https://opentdb.com/api.php?amount=${amount}&category=${category}&difficulty=${apiDifficulty}&type=multiple`;
+            try {
+                questionTextDiv.innerText = '⏳ Loading from OpenTrivia ...';
+                let resp = await fetch(url);
+                let data = await resp.json();
+                if (data.response_code === 0 && data.results.length > 0) {
+                    return data.results.map(q => ({
+                        question: q.question,
+                        options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
+                        correct: q.correct_answer
+                    }));
+                } else {
+                    throw new Error('No questions');
+                }
+            } catch (e) {
+                console.warn('API failed, using fallback.');
+                return fallbackQuestions(amount);
+            }
+        }
+
+        function fallbackQuestions(n) {
+            let arr = [];
+            for(let i=1;i<=n;i++) arr.push({
+                question: `Sample ${i}? (API limit, using local)`,
+                options: ['Option A', 'Option B', 'Option C', 'Option D'],
+                correct: 'Option A'
+            });
+            return arr;
+        }
+
+        function loadQuestion(index) {
+            if (timerInterval) clearInterval(timerInterval);
+            if (!currentQuestions.length || index >= currentQuestions.length) {
+                gameMessage.innerText = 'Quiz finished! final score: ' + score + ' / ' + (totalQuestions*6);
+                submitBtn.disabled = true;
+                return;
+            }
+            const q = currentQuestions[index];
+            questionTextDiv.innerHTML = q.question;
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'option-card';
+                optDiv.dataset.optIndex = idx;
+                optDiv.innerHTML = `<span class="option-prefix">${String.fromCharCode(65+idx)}</span>${opt}`;
+                optDiv.addEventListener('click', () => {
+                    if (optionsLocked) return;
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected-option'));
+                    optDiv.classList.add('selected-option');
+                    selectedOption = opt;
+                    submitBtn.disabled = false;
+                });
+                optionsContainer.appendChild(optDiv);
+            });
+            currentQSpan.innerText = index+1;
+            totalQSpan.innerText = totalQuestions;
+            timeLeft = 10;
+            timerDisplay.innerText = timeLeft + 's';
+            optionsLocked = false;
+            selectedOption = null;
+            submitBtn.disabled = true;
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('disabled-option', 'selected-option'));
+
+            timerInterval = setInterval(() => {
+                timeLeft -= 1;
+                timerDisplay.innerText = timeLeft + 's';
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.innerText = '0s';
+                    optionsLocked = true;
+                    submitBtn.disabled = true;
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.add('disabled-option'));
+                    gameMessage.innerText = '⏰ time out! moving to next...';
+                    setTimeout(() => {
+                        currentIndex++;
+                        if (currentIndex < totalQuestions) loadQuestion(currentIndex);
+                        else endGame();
+                    }, 1200);
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            if (timerInterval) clearInterval(timerInterval);
+            gameMessage.innerText = '🎉 quiz completed! score: ' + score + ' / ' + (totalQuestions*6);
+            submitBtn.disabled = true;
+        }
+
+        async function startGame() {
+            configMode.classList.add('hidden');
+            gameMode.classList.remove('hidden');
+            gameMessage.innerText = '';
+
+            totalQuestions = parseInt(selections.questionCount) || 10;
+            gameDifficultySpan.innerText = selections.difficulty || 'medium';
+            let subj = Array.from(selections.subjects).join(', ').slice(0,20) + (Array.from(selections.subjects).join(', ').length > 20 ? '…' : '');
+            gameMetaSpan.innerText = `class ${selections.classLevel} | ${subj}`;
+
+            // fetch from internet
+            currentQuestions = await fetchQuestions();
+            currentIndex = 0;
+            score = 0;
+            loadQuestion(0);
+        }
+
+        // submit answer
+        submitBtn.addEventListener('click', () => {
+            if (selectedOption === null || optionsLocked) return;
+            optionsLocked = true;
+            clearInterval(timerInterval);
+            const q = currentQuestions[currentIndex];
+            const isCorrect = (selectedOption === q.correct);
+            if (isCorrect) {
+                score += 6;
+                gameMessage.innerText = '✅ correct! +6 marks';
+            } else {
+                gameMessage.innerText = `❌ wrong. correct: ${q.correct}`;
+            }
+            document.querySelectorAll('.option-card').forEach(c => c.classList.add('disabled-option'));
+            submitBtn.disabled = true;
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < totalQuestions) {
+                    loadQuestion(currentIndex);
+                } else {
+                    endGame();
+                }
+            }, 1300);
+        });
+
+        // navigation
+        toStep2Btn.addEventListener('click', (e)=>{ e.preventDefault(); if(!canMoveFrom(1)) {alert('select difficulty'); return;} goToStep(2); });
+        backTo1.addEventListener('click', (e)=>{ e.preventDefault(); goToStep(1); refreshPillsFromState(); });
+        toStep3Btn.addEventListener('click', (e)=>{ e.preventDefault(); if(!canMoveFrom(2)) {alert('choose opponent'); return;} goToStep(3); });
+        backTo2.addEventListener('click', (e)=>{ e.preventDefault(); goToStep(2); refreshPillsFromState(); });
+        toStep4Btn.addEventListener('click', (e)=>{ e.preventDefault(); if(!canMoveFrom(3)) {alert('select question count'); return;} goToStep(4); });
+        backTo3.addEventListener('click', (e)=>{ e.preventDefault(); goToStep(3); refreshPillsFromState(); });
+        toStep5Btn.addEventListener('click', (e)=>{ e.preventDefault(); if(!canMoveFrom(4)) {alert('select at least one subject AND class'); return;} goToStep(5); });
+        backTo4.addEventListener('click', (e)=>{ e.preventDefault(); goToStep(4); refreshPillsFromState(); });
+
+        launchGameBtn.addEventListener('click', startGame);
+
+        backToConfigBtn.addEventListener('click', ()=>{
+            if (timerInterval) clearInterval(timerInterval);
+            gameMode.classList.add('hidden');
+            configMode.classList.remove('hidden');
+            goToStep(5);
+        });
+
+        attachSingleSelect(diffGroup, 'diff');
+        attachSingleSelect(playersGroup, 'player');
+        attachSingleSelect(qGroup, 'q');
+        setupSubjects();
+        goToStep(1);
+    })();
+</script>
+</body>
+</html>
